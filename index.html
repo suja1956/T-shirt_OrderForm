@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customized T-Shirt Order</title>
+</head>
+<body>
+    <h1>Customized T-Shirt Order</h1>
+    <form action="/submit_order" method="post">
+        <label for="tagline">Tagline on the shirt:</label>
+        <input type="text" id="tagline" name="tagline" required><br><br>
+
+        <label for="color">Color:</label><br>
+        <input type="radio" id="Red" name="fav_language" value="Red">
+        <label for="Red">Red</label><br>
+        <input type="radio" id="Green" name="fav_language" value="Green">
+        <label for="Green">Green</label><br>
+        <input type="radio" id="Blue" name="fav_language" value="Blue">
+        <label for="Blue">Blue</label><br><br>
+
+        <label for="size">Size:</label>
+        <select id="size" name="size" required>
+            <option value="">Select Size</option>
+            <option value="small">Small</option>
+            <option value="medium">Medium</option>
+            <option value="large">Large</option>
+            <option value="xl">XL</option>
+        </select><br><br>
+        <label for="quantity">Quantity:</label>
+        <input type="number" id="quantity" name="quantity" min="1" required><br><br>
+
+        <label for="delivery_date">Delivery Date:</label>
+        <input type="date" id="delivery_date" name="delivery_date" required><br><br>
+
+        <label for="delivery_details">Delivery Details:</label><br>
+        <textarea id="delivery_details" name="delivery_details" rows="4"></textarea><br>
+        <button type="submit">Place Order</button>
+    </form>
+</body>
+</html>
