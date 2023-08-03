@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Customized T-Shirt Order</title>
+    <title >Customized T-Shirt Order</title>
 </head>
 <body>
     <h1>Customized T-Shirt Order</h1>
@@ -18,8 +18,8 @@
         <label for="Green">Green</label><br>
         <input type="radio" id="Blue" name="fav_language" value="Blue">
         <label for="Blue">Blue</label><br><br>
-        <label for="favcolor">Select your favorite color:</label>
-        <input type="color" id="favcolor" name="favcolor"><br><br>
+<!--         <label for="favcolor">Select your favorite color:</label>
+        <input type="color" id="favcolor" name="favcolor"><br><br> -->
 
         <label for="size">Size:</label>
         <select id="size" name="size" required>
@@ -34,8 +34,10 @@
 
         <label for="delivery_date">Delivery Date:</label>
         <input type="date" id="delivery_date" name="delivery_date" required><br><br>
+        <label for="email">Enter your email:</label>
+        <input type="email" id="email" name="email">
 
-        <label for="delivery_details">Delivery Details:</label><br>
+        <label for="delivery_details">Address:</label><br>
         <textarea id="delivery_details" name="delivery_details" rows="4"></textarea><br>
         <button type="submit">Place Order</button>
         <input type="reset" value="Reset">
