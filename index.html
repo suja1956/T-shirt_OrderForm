@@ -27,6 +27,9 @@
             renderer.autoClear = true;
 
             scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera();
+            camera.matrixAutoUpdate = false;
+
 
 // The cube will have a different color on each side.
 const materials = [
