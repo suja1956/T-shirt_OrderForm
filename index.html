@@ -1,79 +1,64 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-    />
-    <title>Hello WebXR AR!</title>
-    <style>
-      body {
-        margin: 0;
-        overflow: hidden;
-      }
-      canvas {
-        display: block;
-      }
-    </style>
-  </head>
-  <body>
-    <!-- Include Three.js and the ARButton helper -->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebXR AR Demo</title>
     <script src="https://unpkg.com/three@0.126.0/build/three.min.js"></script>
-    <script src="https://unpkg.com/three@0.126.0/examples/jsm/webxr/ARButton.js"></script>
-    <script type="module">
-      // Create the scene, camera and renderer.
-      const scene = new THREE.Scene();
+</head>
+<body>
+    <button id="startButton">Start AR</button>
+    <script>
+        let renderer, scene, camera, session;
 
-      // Set up a basic PerspectiveCamera.
-      const camera = new THREE.PerspectiveCamera(
-        70,
-        window.innerWidth / window.innerHeight,
-        0.01,
-        20
-      );
+        async function initXR() {
+            if (!navigator.xr) {
+                alert("WebXR not supported in this browser");
+                return;
+            }
 
-      // Create a WebGLRenderer with antialiasing and transparency.
-      const renderer = new THREE.WebGLRenderer({
-        antialias: true,
-        alpha: true
-      });
-      renderer.setPixelRatio(window.devicePixelRatio);
-      renderer.setSize(window.innerWidth, window.innerHeight);
-      renderer.xr.enabled = true; // Enable XR on the renderer.
-      document.body.appendChild(renderer.domElement);
+            session = await navigator.xr.requestSession("immersive-ar", { requiredFeatures: ['local'] });
 
-      // Add ARButton to allow the user to start an AR session.
-      // (You can add options such as requiredFeatures if needed.)
-      document.body.appendChild(ARButton.createButton(renderer, { requiredFeatures: [] }));
+            const canvas = document.createElement("canvas");
+            document.body.appendChild(canvas);
+            const gl = canvas.getContext("webgl", { xrCompatible: true });
 
-      // Create a cube with a different color on each face.
-      const geometry = new THREE.BoxGeometry(0.2, 0.2, 0.2);
-      const materials = [
-        new THREE.MeshBasicMaterial({ color: 0xff0000 }), // right face
-        new THREE.MeshBasicMaterial({ color: 0x0000ff }), // left face
-        new THREE.MeshBasicMaterial({ color: 0x00ff00 }), // top face
-        new THREE.MeshBasicMaterial({ color: 0xff00ff }), // bottom face
-        new THREE.MeshBasicMaterial({ color: 0x00ffff }), // front face
-        new THREE.MeshBasicMaterial({ color: 0xffff00 })  // back face
-      ];
-      const cube = new THREE.Mesh(geometry, materials);
-      // Place the cube half a meter in front of the viewer.
-      cube.position.set(0, 0, -0.5);
-      scene.add(cube);
+            renderer = new THREE.WebGLRenderer({ alpha: true, preserveDrawingBuffer: true, canvas, context: gl });
+            renderer.autoClear = true;
 
-      // Handle window resize events.
-      window.addEventListener('resize', onWindowResize, false);
-      function onWindowResize() {
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize(window.innerWidth, window.innerHeight);
-      }
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera();
+            camera.matrixAutoUpdate = false;
 
-      // Start the render loop.
-      renderer.setAnimationLoop(() => {
-        renderer.render(scene, camera);
-      });
+            const cubeGeometry = new THREE.BoxGeometry(0.2, 0.2, 0.2);
+            const cubeMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+            const cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+            cube.position.set(0, 0, -0.5);
+            scene.add(cube);
+
+            session.updateRenderState({ baseLayer: new XRWebGLLayer(session, gl) });
+            const referenceSpace = await session.requestReferenceSpace("local");
+
+            function renderXRFrame(time, frame) {
+                session.requestAnimationFrame(renderXRFrame);
+                const pose = frame.getViewerPose(referenceSpace);
+                if (!pose) return;
+
+                const view = pose.views[0];
+                const viewport = session.renderState.baseLayer.getViewport(view);
+                renderer.setSize(viewport.width, viewport.height);
+
+                camera.matrix.fromArray(view.transform.matrix);
+                camera.projectionMatrix.fromArray(view.projectionMatrix);
+                camera.updateMatrixWorld(true);
+
+                gl.bindFramebuffer(gl.FRAMEBUFFER, session.renderState.baseLayer.framebuffer);
+                renderer.render(scene, camera);
+            }
+            session.requestAnimationFrame(renderXRFrame);
+        }
+        
+        document.getElementById("startButton").addEventListener("click", initXR);
     </script>
-  </body>
+</body>
 </html>
